@@ -1,12 +1,13 @@
-var path = require('path')
-var HtmlWebpackPlugin = require('html-webpack-plugin')
+const path = require('path')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const webpack = require('webpack')
 
-module.exports = {
+let config = {
   entry: './src/index.js',
   output: {
-    path: path.resolve(__dirname, 'build'),
-    filename: 'index_bundle.js',
-    publicPath: '/'
+    path: path.resolve(__dirname, 'public'),
+    filename: 'bundle.js',
+    publicPath: '/public/'
   },
   module: {
     rules: [
@@ -22,3 +23,16 @@ module.exports = {
     template: 'src/index.html'
   })]
 }
+
+if (process.env.NODE_ENV === 'production') {
+  config.plugins.push(
+    new webpack.DefinePlugin({
+      'process_env': {
+        'NODE_ENV': JSON.stringify(process.env.NODE_ENV)
+      }
+    }),
+    new webpack.optimize.UglifyJsPlugin()
+  )
+}
+
+module.exports = config
