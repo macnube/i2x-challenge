@@ -8,7 +8,8 @@ class Login extends Component {
     this.state = {
       email: '',
       password: '',
-      error: ''
+      error: '',
+      loading: false
     }
 
     this.handleEmailChange = this.handleEmailChange.bind(this)
@@ -31,15 +32,23 @@ class Login extends Component {
   handleSubmit (event) {
     event.preventDefault()
     const { email, password } = this.state
-    if (checkLogin(email, password)) {
-      console.log('here')
+    if (!email || !password) {
+      this.setState({
+        error: 'Please input both email and password'
+      })
+    } else if (checkLogin(email, password)) {
+      this.setState({
+        loading: true,
+        error: ''
+      })
       i2xLogin(email, password)
       .then((res) => {
         this.props.onReceiveToken(res.data.token)
       })
       .catch((err) => {
         this.setState({
-          error: err
+          error: err,
+          loading: false
         })
       })
     } else {
@@ -74,9 +83,8 @@ class Login extends Component {
           />
           <button
             className='media-button'
-            type='submit'
-            disabled={!this.state.username && !this.state.password}>
-            Sign in
+            type='submit'>
+            {this.state.loading ? 'Signing in...' : 'Sign in'}
           </button>
         </form>
         <div className='error-container'>
